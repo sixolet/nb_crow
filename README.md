@@ -8,4 +8,4 @@ To get triggers instead of envelopes, choose attack and decay shapes of "now" an
 
 The "tuned to" parameter should be what your oscillator outputs at 0V of pitch cv.
 
-The "tune" parameter is experimental. You are supposed to be able to patch your oscillator to crow input 1, and trigger "tune", and it will detect the right pitch to put in "tuned to". Unfortunately, I don't think Crow is accurate enough about pitch tracking for this to work well. It should get you in the ballpark though. For me it leaves me fifty cents flat for bass, and waaaay wronger the higher pitch we go. Try it and tell me if your crow does better!
+The "tune" parameter autmoatically tunes your oscillator. Patch your oscillator (or voice) to Norns left input (turn down the monitor), make it the only thing your Norns left input hears, and trigger `tune`. Norns will listen to your sound at 0v of pitch and automatically set the "tuned to" value accordingly.
