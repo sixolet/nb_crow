@@ -61,11 +61,14 @@ function add_player(cv, env)
         else
             crow.output[cv].volts = v8
         end
+        local action
         if self.count > 0 and legato > 0 then
-            crow.output[env].action = string.format("{ to(%f,%f,%s) }", v_vel*sustain, decay, decay_shape)
+            action = string.format("{ to(%f,%f,'%s') }", v_vel*sustain, decay, decay_shape)
         else
-            crow.output[env].action = string.format("{ to(%f,%f,%s), to(%f,%f,%s) }", v_vel, attack, attack_shape, v_vel*sustain, decay, decay_shape)
+            action = string.format("{ to(%f,%f,'%s'), to(%f,%f,'%s') }", v_vel, attack, attack_shape, v_vel*sustain, decay, decay_shape)
         end
+        print(action)
+        crow.output[env].action = action
         crow.output[env]()
         self.count = self.count + 1
     end
@@ -77,7 +80,7 @@ function add_player(cv, env)
             self.count = 0
             local release = params:get("nb_crow_release_time"..self.ext)
             local release_shape = ASL_SHAPES[params:get("nb_crow_release_shape"..self.ext)]
-            crow.output[env].action = string.format("{ to(%f,%f,%s) }", 0, release, release_shape)
+            crow.output[env].action = string.format("{ to(%f,%f,'%s') }", 0, release, release_shape)
             crow.output[env]()
         end
     end
@@ -110,17 +113,27 @@ function add_player(cv, env)
         self.tuning = true
         crow.output[cv].volts = 0
         crow.output[env].volts = 5
-        crow.input[1].freq = function(f)
-            print("freq is", f)
-            params:set("nb_crow_freq"..self.ext, f)         
+
+        local p = poll.set("pitch_in_l")
+        p.callback = function(f) 
+            print("in > "..string.format("%.2f",f))
+            params:set("nb_crow_freq"..self.ext, f)
         end
-        crow.input[1].mode( 'freq', 2)
+        p.time = 0.25
+        p:start()
+        -- This is crow pitch tracking that doesn't work
+        -- crow.input[1].freq = function(f)
+        --     print("freq is", f)
+        --     params:set("nb_crow_freq"..self.ext, f)         
+        -- end
+        -- crow.input[1].mode( 'freq', 2)
         clock.run(function()
-            clock.sleep(10)
-            crow.output[env].volts = 0
-            crow.input[1].mode('none')
-            clock.sleep(0.2)
-            self.tuning = false
+             clock.sleep(10)
+             p:stop()
+             crow.output[env].volts = 0
+             -- crow.input[1].mode('none')
+             clock.sleep(0.2)
+             self.tuning = false
         end)
     end
     note_players["crow "..cv.."/"..env] = player
