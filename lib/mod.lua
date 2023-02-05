@@ -15,7 +15,7 @@ local function freq_to_note_num_float(freq)
     return 60 + 12*math.log(ratio)/math.log(2)
 end
 
-function add_player(cv, env)
+local function add_player(cv, env)
     local player = {
         ext = "_"..cv.."_"..env,
         count = 0,
